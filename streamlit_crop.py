@@ -2,6 +2,9 @@ import mysql.connector
 from mysql.connector import Error
 import pandas as pd
 import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+import streamlit as st
 
 # Database configuration
 config = {
@@ -52,9 +55,9 @@ def initialize():
     
     try:
         # Queries
-        crop_query = """SELECT * FROM forest_data LIMIT 45015"""
+        crop_query = """SELECT * FROM crop_data LIMIT 45015"""
         
-        crop_data fetch_data(conn, forest_query)
+        crop_data fetch_data(conn,crop_query)
     
     finally:
         if conn.is_connected():
@@ -64,9 +67,7 @@ def initialize():
 if __name__ == "__main__":
     initialize()
 
-import pandas as pd
-import matplotlib.pyplot as plt
-import streamlit as st
+
 
 # Set color scheme
 COLOR_1='#C8920B'
