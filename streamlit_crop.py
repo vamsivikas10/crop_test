@@ -106,19 +106,19 @@ apply_year_filter  = st.sidebar.checkbox("Apply Year filter", value=True)
 selected_year = st.sidebar.multiselect("Select Year", crop["Year"].unique(), default=crop["Year"].unique())
 
 apply_country_filter = st.sidebar.checkbox("Apply Country filter", value=True)
-selected_country = st.sidebar.multiselect("Select Country", crop["Country"].unique(), default=crop["Country"].unique())
+selected_country = st.sidebar.multiselect("Select Country", crop["Area"].unique(), default=crop["Area"].unique())
 
 # Handle empty filters
 
 selected_year = selected_year or crop["Year"].unique()
-selected_country = selected_country or crop["Country"].unique()
+selected_country = selected_country or crop["Area"].unique()
 
 # Apply filters dynamically based on checkboxes and selections
 
 if apply_year_filter:
-    crop = crop[crop["Year"].isin(selected_year)]
+    filtered_crop = crop[crop["Year"].isin(selected_year)]
 if apply_country_filter:
-    crop = crop[crop["Country"].isin(selected_country)] 
+    filtered_crop = crop[crop["Area"].isin(selected_country)] 
 
 
 #crop_final  = crop[crop["Year"].isin(selected_year) & crop["Country"].isin(selected_country)]
@@ -131,7 +131,7 @@ if analysis_type == 'Analyze Crop Distribution':
     
     with col1:
         st.subheader("Top Cultivated Crops")
-        top_crops = filtered_crop.groupby('Item')['Area harvested'].sum().nlargest(10)
+        top_crops = filtered_crop.groupby('Item')['Area_Harvested'].sum().nlargest(10)
         fig, ax = plt.subplots()
         top_crops.plot(kind='barh', color=COLOR_1, ax=ax)
         ax.set_xlabel('Total Area Harvested (ha)')
@@ -199,7 +199,7 @@ elif analysis_type == 'Environmental Relationships':
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.scatterplot(
         data=filtered_crop,
-        x='Area harvested',
+        x='Area_Harvested',
         y='Yield',
         hue='Item',
         alpha=0.6,
@@ -241,7 +241,7 @@ elif analysis_type == 'Input-Output Relationships':
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.regplot(
         data=filtered_crop,
-        x='Area harvested',
+        x='Area_Harvested',
         y='Production',
         scatter_kws={'alpha':0.3},
         line_kws={'color':'red'},
