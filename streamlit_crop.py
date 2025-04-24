@@ -193,9 +193,7 @@ elif analysis_type == 'Temporal Analysis':
     plt.tight_layout(rect=[0, 0, 0.85, 1])
     st.pyplot(fig)
 
-    ###
    # Yield Growth Analysis Section
-  # Yield Growth Analysis Section
     st.subheader("Yield Growth Analysis")
     
     # Step 1: Get top N crops by median yield (default N=10)
