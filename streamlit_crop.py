@@ -195,11 +195,12 @@ elif analysis_type == 'Temporal Analysis':
 
     ###
    # Yield Growth Analysis Section
+  # Yield Growth Analysis Section
     st.subheader("Yield Growth Analysis")
     
-    # Step 1: Get top N crops by median yield (with default N=10)
+    # Step 1: Get top N crops by median yield (default N=10)
     top_n = st.slider(
-        "Show top N crops by median yield", 
+        "Number of top crops to display", 
         min_value=5, 
         max_value=50, 
         value=10,
@@ -207,21 +208,19 @@ elif analysis_type == 'Temporal Analysis':
     )
     
     # Calculate top crops (using median to avoid outlier skew)
-    top_crops = filtered_crop.groupby('Item')['Yield'].median().nlargest(top_n).index
+    top_crops = filtered_crop.groupby('Item')['Yield'].median().nlargest(top_n)
     
-    # Step 2: Selectbox with first crop as default
-    default_crop = top_crops[0]  # First item in top crops
-    selected_crop_trend = st.selectbox(
-        "Select Crop for Analysis",
-        options=top_crops,
-        index=0,  # Default to first item
-        key='yield_crop_select'
-    )
-    
-    # Step 3: Filter data and plot
-    crop_trend = filtered_crop[filtered_crop['Item'] == selected_crop_trend]
-    
-    if not crop_trend.empty:
+    # Step 2: Create selectbox without default selection
+    if not top_crops.empty:
+        selected_crop_trend = st.selectbox(
+            "Select Crop for Analysis",
+            options=top_crops.index.tolist(),
+            key='yield_crop_select'
+        )
+        
+        # Step 3: Filter data and plot
+        crop_trend = filtered_crop[filtered_crop['Item'] == selected_crop_trend]
+        
         fig, ax = plt.subplots(figsize=(10, 5))
         sns.lineplot(
             data=crop_trend,
@@ -240,7 +239,7 @@ elif analysis_type == 'Temporal Analysis':
         plt.legend(
             title='Region',
             bbox_to_anchor=(1.05, 1),
-            loc='upper left'
+            loc='upper-left'
         )
         plt.tight_layout()
         st.pyplot(fig)
@@ -252,7 +251,7 @@ elif analysis_type == 'Temporal Analysis':
                 .style.background_gradient(cmap='YlOrBr')
             )
     else:
-        st.warning("No data available for the selected crop.")
+        st.warning("No crops available for analysis.")
 
 elif analysis_type == 'Environmental Relationships':
     st.header("🌍 Environmental Relationships")
