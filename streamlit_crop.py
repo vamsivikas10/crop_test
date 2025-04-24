@@ -253,32 +253,40 @@ elif analysis_type == 'Temporal Analysis':
 elif analysis_type == 'Environmental Relationships':
     st.header("🌍 Environmental Relationships")
     
-    st.subheader("Area Harvested vs Yield")
-    fig, ax = plt.subplots(figsize=(10, 6))
+    st.subheader("Yield vs Area (200 Areas)")
+    fig, ax = plt.subplots(figsize=(14, 8))
+    
+    # Hexbin for density (handles overlapping points)
+    hexbin = ax.hexbin(
+        x=filtered_crop['Area_Harvested'],
+        y=filtered_crop['Yield'],
+        gridsize=40,
+        cmap='YlOrBr',
+        bins='log',
+        mincnt=1,
+        alpha=0.7
+    )
+    
+    # Overlay a sample of points for context
+    sample_df = filtered_crop.sample(1000)  # Avoid overplotting
     sns.scatterplot(
-        data=filtered_crop,
+        data=sample_df,
         x='Area_Harvested',
         y='Yield',
-        hue='Item',
-        alpha=0.6,
-        ax=ax
+        color='red',
+        alpha=0.3,
+        s=20,
+        ax=ax,
+        label='Sample Points'
     )
+    
     ax.set_xscale('log')
     ax.set_yscale('log')
-    ax.set_title('Resource Utilization vs Productivity')
+    cb = fig.colorbar(hexbin)
+    cb.set_label('Log10(Data Density)')
+    plt.legend()
     st.pyplot(fig)
     
-    st.subheader("Yield Distribution by Crop")
-    fig, ax = plt.subplots(figsize=(12, 6))
-    sns.boxplot(
-        data=filtered_crop,
-        x='Item',
-        y='Yield',
-        color=COLOR_1
-    )
-    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
-    st.pyplot(fig)
-
 elif analysis_type == 'Input-Output Relationships':
     st.header("⚙️ Input-Output Relationships")
     
