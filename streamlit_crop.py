@@ -237,7 +237,7 @@ elif analysis_type == 'Temporal Analysis':
         plt.legend(
             title='Region',
             bbox_to_anchor=(1.05, 1),
-            loc='upper-left'
+            loc='upper_left'
         )
         plt.tight_layout()
         st.pyplot(fig)
