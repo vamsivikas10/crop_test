@@ -253,7 +253,7 @@ elif analysis_type == 'Temporal Analysis':
 elif analysis_type == 'Environmental Relationships':
     st.header("🌍 Environmental Relationships")
     
-    st.subheader("Yield vs Area (200 Areas)")
+    st.subheader("Yield vs Area")
     fig, ax = plt.subplots(figsize=(14, 8))
     
     # Hexbin for density (handles overlapping points)
