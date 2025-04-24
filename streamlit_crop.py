@@ -219,29 +219,27 @@ elif analysis_type == 'Temporal Analysis':
         # Step 3: Filter data and plot
         crop_trend = filtered_crop[filtered_crop['Item'] == selected_crop_trend]
         
-        fig, ax = plt.subplots(figsize=(10, 5))
-        sns.lineplot(
-            data=crop_trend,
-            x='Year',
-            y='Yield',
-            hue='Area',
-            estimator='median',
-            ax=ax,
-            linewidth=2
+              # Pivot to Year vs Area matrix
+        heatmap_data = crop_trend.pivot_table(
+            index='Year', 
+            columns='Area', 
+            values='Yield',
+            aggfunc='median'
         )
-        ax.set_title(f'Yield Trend for {selected_crop_trend}', pad=15)
-        ax.set_ylabel('Yield (hg/ha)')
-        ax.grid(True, alpha=0.3)
         
-        # Improve legend
-        plt.legend(
-            title='Region',
-            bbox_to_anchor=(1.05, 1),
-            loc='upper left'
+        # Plotly interactive heatmap
+        fig = px.imshow(
+            heatmap_data,
+            labels=dict(x="Region", y="Year", color="Yield"),
+            color_continuous_scale='YlOrBr',
+            aspect='auto'
         )
-        plt.tight_layout()
-        st.pyplot(fig)
-        
+        fig.update_layout(
+            title=f'Yield Trends for {selected_crop_trend} (200 Regions)',
+            height=800
+        )
+        st.plotly_chart(fig, use_container_width=True)
+                
         # Show summary stats
         with st.expander("📊 View summary statistics"):
             st.dataframe(
