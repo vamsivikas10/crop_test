@@ -43,7 +43,7 @@ def create_connection():
         return None
 
 def initialize():
-    global   # Declare as global
+    global crop_data_df  # Declare as global
     
     # Create connection
     conn = create_connection()
