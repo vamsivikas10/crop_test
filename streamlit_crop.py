@@ -3,7 +3,8 @@ from mysql.connector import Error
 import pandas as pd
 import numpy as np
 import seaborn as sns
-import matplotlib as pt
+import matplotlib as plt
+import streamlit as st
 
 # Database configuration
 config = {
