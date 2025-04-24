@@ -52,9 +52,9 @@ def initialize():
     
     try:
         # Queries
-        crop_query = """SELECT * FROM forest_data LIMIT 45015"""
+        crop_query = """SELECT * FROM crop_data LIMIT 45015"""
         
-        crop_data_df =fetch_data(conn, forest_query)
+        crop_data_df = fetch_data(conn, crop_query)
     
     finally:
         if conn.is_connected():
