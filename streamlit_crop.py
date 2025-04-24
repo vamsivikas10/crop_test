@@ -84,12 +84,17 @@ crop=crop_data_df
 st.title(":blue[Bird Species Analysis]")
 
 # Sidebar options
-selectors = st.sidebar.radio('Analaysis Type:', [':blue[Analyze Crop Distribution]',
-                                                    ':blue[Temporal Analysis]',
-                                                    ':blue[Environmental Relationships]',
-                                                    ':blue[Input-Output Relationships
-                                                    ':blue[Comparative Analysis]',
-                                                    ,':blue[Outliers and Anomalies]'])
+analysis_type = st.sidebar.radio(
+    'Analysis Type:', 
+    [
+        'Analyze Crop Distribution',
+        'Temporal Analysis',
+        'Environmental Relationships',
+        'Input-Output Relationships',
+        'Comparative Analysis',
+        'Outliers and Anomalies'
+    ]
+)
 
 # Sidebar Filters #
 st.sidebar.header("Filters")
