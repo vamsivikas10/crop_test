@@ -162,44 +162,94 @@ if analysis_type == 'Analyze Crop Distribution':
 elif analysis_type == 'Temporal Analysis':
     st.header("📈 Temporal Trends Analysis")
     
-    st.subheader("Yearly Production Trends")
-    yearly_trends = filtered_crop.groupby(['Year', 'Item'])['Production'].sum().unstack()
-    fig, ax = plt.subplots(figsize=(12, 6))
-    yearly_trends.plot(ax=ax)
+    # Let user select top N crops to display
+    n_crops = st.slider("Select number of top crops to display", 5, 50, 10)
+    
+    # Calculate top crops by total production
+    top_crops = filtered_crop.groupby('Item')['Production'].sum().nlargest(n_crops).index
+    
+    st.subheader(f"Yearly Production Trends (Top {n_crops} Crops)")
+    yearly_trends = filtered_crop[filtered_crop['Item'].isin(top_crops)].groupby(['Year', 'Item'])['Production'].sum().unstack()
+    
+    fig, ax = plt.subplots(figsize=(14, 8))
+    yearly_trends.plot(ax=ax, linewidth=2)
     ax.set_ylabel('Production (tonnes)')
-    ax.set_title('Production Trends Over Time')
+    ax.set_title(f'Production Trends of Top {n_crops} Crops', pad=20)
     ax.tick_params(axis='x', rotation=45)
     ax.grid(True, alpha=0.3)
-
-    # Move legend outside the plot area
-    plt.legend(
-    title='Crops',
-    bbox_to_anchor=(1.05, 1),  # Positions legend outside to the right
-    loc='upper left',
-    borderaxespad=0.
-)
-
-    # Adjust layout to prevent clipping
-    plt.tight_layout(rect=[0, 0, 0.85, 1])  # Right side padding for legend
-    st.pyplot(fig)
     
-    st.subheader("Yield Growth Analysis")
-    selected_crop_trend = st.selectbox(
-        "Select Crop for Yield Analysis",
-        filtered_crop['Item'].unique()
+    # legend handling
+    plt.legend(
+        title='Crops',
+        bbox_to_anchor=(1.05, 1),
+        loc='upper left',
+        borderaxespad=0.,
+        fontsize='small'  # Smaller font for more items
     )
-    crop_trend = filtered_crop[filtered_crop['Item'] == selected_crop_trend]
-    fig, ax = plt.subplots(figsize=(10, 5))
-    sns.lineplot(
-        data=crop_trend,
-        x='Year',
-        y='Yield',
-        hue='Area',
-        estimator='median',
-        ax=ax
-    )
-    ax.set_title(f'Yield Trend for {selected_crop_trend}')
+    
+    plt.tight_layout(rect=[0, 0, 0.85, 1])
     st.pyplot(fig)
+
+    ###
+   # Yield Growth Analysis Section
+    st.subheader("Yield Growth Analysis")
+    
+    # Step 1: Get top N crops by median yield (with default N=10)
+    top_n = st.slider(
+        "Show top N crops by median yield", 
+        min_value=5, 
+        max_value=50, 
+        value=10,
+        key='yield_top_n'
+    )
+    
+    # Calculate top crops (using median to avoid outlier skew)
+    top_crops = filtered_crop.groupby('Item')['Yield'].median().nlargest(top_n).index
+    
+    # Step 2: Selectbox with first crop as default
+    default_crop = top_crops[0]  # First item in top crops
+    selected_crop_trend = st.selectbox(
+        "Select Crop for Analysis",
+        options=top_crops,
+        index=0,  # Default to first item
+        key='yield_crop_select'
+    )
+    
+    # Step 3: Filter data and plot
+    crop_trend = filtered_crop[filtered_crop['Item'] == selected_crop_trend]
+    
+    if not crop_trend.empty:
+        fig, ax = plt.subplots(figsize=(10, 5))
+        sns.lineplot(
+            data=crop_trend,
+            x='Year',
+            y='Yield',
+            hue='Area',
+            estimator='median',
+            ax=ax,
+            linewidth=2
+        )
+        ax.set_title(f'Yield Trend for {selected_crop_trend}', pad=15)
+        ax.set_ylabel('Yield (hg/ha)')
+        ax.grid(True, alpha=0.3)
+        
+        # Improve legend
+        plt.legend(
+            title='Region',
+            bbox_to_anchor=(1.05, 1),
+            loc='upper left'
+        )
+        plt.tight_layout()
+        st.pyplot(fig)
+        
+        # Show summary stats
+        with st.expander("📊 View summary statistics"):
+            st.dataframe(
+                crop_trend.groupby('Area')['Yield'].describe()
+                .style.background_gradient(cmap='YlOrBr')
+            )
+    else:
+        st.warning("No data available for the selected crop.")
 
 elif analysis_type == 'Environmental Relationships':
     st.header("🌍 Environmental Relationships")
