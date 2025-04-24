@@ -2,9 +2,6 @@ import mysql.connector
 from mysql.connector import Error
 import pandas as pd
 import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-import streamlit as st
 
 # Database configuration
 config = {
@@ -46,7 +43,7 @@ def create_connection():
         return None
 
 def initialize():
-    global crop_data_df  # Declare as global
+    global   # Declare as global
     
     # Create connection
     conn = create_connection()
@@ -55,9 +52,9 @@ def initialize():
     
     try:
         # Queries
-        crop_query = """SELECT * FROM crop_data LIMIT 45015"""
+        crop_query = """SELECT * FROM forest_data LIMIT 45015"""
         
-        crop_data_df = fetch_data(conn,crop_query)
+        crop_data_df =fetch_data(conn, forest_query)
     
     finally:
         if conn.is_connected():
@@ -66,7 +63,6 @@ def initialize():
 
 if __name__ == "__main__":
     initialize()
-
 
 
 # Set color scheme
@@ -152,7 +148,7 @@ if analysis_type == 'Analyze Crop Distribution':
         index='Area', 
         columns='Item', 
         values='Production', 
-        aggfunc='sum'
+        aggfunc='mean'
     ).fillna(0)
     fig, ax = plt.subplots(figsize=(12, 8))
     sns.heatmap(
@@ -172,6 +168,19 @@ elif analysis_type == 'Temporal Analysis':
     yearly_trends.plot(ax=ax)
     ax.set_ylabel('Production (tonnes)')
     ax.set_title('Production Trends Over Time')
+    ax.tick_params(axis='x', rotation=45)
+    ax.grid(True, alpha=0.3)
+
+    # Move legend outside the plot area
+    plt.legend(
+    title='Crops',
+    bbox_to_anchor=(1.05, 1),  # Positions legend outside to the right
+    loc='upper left',
+    borderaxespad=0.
+)
+
+    # Adjust layout to prevent clipping
+    plt.tight_layout(rect=[0, 0, 0.85, 1])  # Right side padding for legend
     st.pyplot(fig)
     
     st.subheader("Yield Growth Analysis")
@@ -272,7 +281,7 @@ elif analysis_type == 'Comparative Analysis':
         st.pyplot(fig)
         
     st.subheader("Productivity Analysis")
-    filtered_crop['Productivity'] = filtered_crop['Production'] / filtered_crop['Area harvested']
+    filtered_crop['Productivity'] = filtered_crop['Production'] / filtered_crop['Area_Harvested']
     productive_regions = filtered_crop.groupby(['Area', 'Item'])['Productivity'].mean().unstack()
     fig, ax = plt.subplots(figsize=(12, 6))
     productive_regions.nlargest(10, productive_regions.columns[0]).plot(
@@ -339,5 +348,3 @@ st.write(f"Total records: {len(filtered_crop):,}")
 st.write(f"Time period: {filtered_crop['Year'].min()} to {filtered_crop['Year'].max()}")
 st.write(f"Regions: {len(filtered_crop['Area'].unique())}")
 st.write(f"Crops: {len(filtered_crop['Item'].unique())}")
-
-
