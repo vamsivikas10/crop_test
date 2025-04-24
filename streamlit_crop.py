@@ -46,7 +46,7 @@ def create_connection():
         return None
 
 def initialize():
-    global   # Declare as global
+    global crop_data_df  # Declare as global
     
     # Create connection
     conn = create_connection()
@@ -57,7 +57,7 @@ def initialize():
         # Queries
         crop_query = """SELECT * FROM crop_data LIMIT 45015"""
         
-        crop_data fetch_data(conn,crop_query)
+        crop_data_df = fetch_data(conn,crop_query)
     
     finally:
         if conn.is_connected():
