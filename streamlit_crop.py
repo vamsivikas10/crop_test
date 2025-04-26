@@ -100,26 +100,27 @@ analysis_type = st.sidebar.radio(
 # Sidebar Filters #
 st.sidebar.header("Filters")
 
-# Checkbox for year Filter and country Filter
-
-apply_year_filter  = st.sidebar.checkbox("Apply Year filter", value=True)
-selected_year = st.sidebar.multiselect("Select Year", crop["Year"].unique(), default=crop["Year"].unique())
+# Checkboxes and selectors
+apply_year_filter = st.sidebar.checkbox("Apply Year filter", value=True)
+selected_year = st.sidebar.multiselect("Select Year", options=crop["Year"].unique(), default=crop["Year"].unique())
 
 apply_country_filter = st.sidebar.checkbox("Apply Country filter", value=True)
-selected_country = st.sidebar.multiselect("Select Country", crop["Area"].unique(), default=crop["Area"].unique())
+selected_country = st.sidebar.multiselect("Select Country", options=crop["Area"].unique(), default=crop["Area"].unique())
 
-# Handle empty filters
+# Initialize filtered data
+filtered_crop = crop.copy()
 
-selected_year = selected_year or crop["Year"].unique()
-selected_country = selected_country or crop["Area"].unique()
-
-# Apply filters dynamically based on checkboxes and selections
-
+# Handle empty selections ONLY if filter is enabled
 if apply_year_filter:
-    filtered_crop = crop[crop["Year"].isin(selected_year)]
-if apply_country_filter:
-    filtered_crop = crop[crop["Area"].isin(selected_country)] 
+    selected_year = selected_year or crop["Year"].unique()
+    filtered_crop = filtered_crop[filtered_crop["Year"].isin(selected_year)]
 
+if apply_country_filter:
+    selected_country = selected_country or crop["Area"].unique()
+    filtered_crop = filtered_crop[filtered_crop["Area"].isin(selected_country)]
+
+# # Display filtered results
+# st.write(f"Filtered to {len(filtered_crop)} records")
 
 #crop_final  = crop[crop["Year"].isin(selected_year) & crop["Country"].isin(selected_country)]
 
@@ -164,6 +165,7 @@ if analysis_type == 'Analyze Crop Distribution':
     st.pyplot(fig)
 
 elif analysis_type == 'Temporal Analysis':
+    ##############
     st.header("📈 Temporal Trends Analysis")
     
     # Let user select top N crops to display
@@ -194,6 +196,7 @@ elif analysis_type == 'Temporal Analysis':
     plt.tight_layout(rect=[0, 0, 0.85, 1])
     st.pyplot(fig)
 
+   #########
    # Yield Growth Analysis Section
     st.subheader("Yield Growth Analysis")
     
