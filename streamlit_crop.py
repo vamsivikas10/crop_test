@@ -97,7 +97,7 @@ analysis_type = st.sidebar.radio(
     ]
 )
 
-# Sidebar Filters #
+# Sidebar Filters
 st.sidebar.header("Filters")
 
 # Checkboxes and selectors
@@ -110,19 +110,19 @@ selected_country = st.sidebar.multiselect("Select Country", options=crop["Area"]
 # Initialize filtered data
 filtered_crop = crop.copy()
 
-# Handle empty selections ONLY if filter is enabled
+# Apply filters if enabled (handle empty selections too)
 if apply_year_filter:
-    selected_year = selected_year or crop["Year"].unique()
+    selected_year = selected_year or crop["Year"].unique()  # Default to all years
     filtered_crop = filtered_crop[filtered_crop["Year"].isin(selected_year)]
 
 if apply_country_filter:
-    selected_country = selected_country or crop["Area"].unique()
+    selected_country = selected_country or crop["Area"].unique()  # Default to all countries
     filtered_crop = filtered_crop[filtered_crop["Area"].isin(selected_country)]
 
 # # Display filtered results
 # st.write(f"Filtered to {len(filtered_crop)} records")
 
-#crop_final  = crop[crop["Year"].isin(selected_year) & crop["Country"].isin(selected_country)]
+
 
 # Main analysis sections
 if analysis_type == 'Analyze Crop Distribution':
@@ -183,10 +183,10 @@ elif analysis_type == 'Temporal Analysis':
     n_crops = st.slider("Select number of top crops to display", 5, 50, 10)
     
     # Calculate top crops by total production
-    top_crops = filtered_crop.groupby('Item')['Production'].sum().nlargest(n_crops).index
+    top_p_crops = filtered_crop.groupby('Item')['Production'].sum().nlargest(n_crops).index
     
     st.subheader(f"Yearly Production Trends (Top {n_crops} Crops)")
-    yearly_trends = filtered_crop[filtered_crop['Item'].isin(top_crops)].groupby(['Year', 'Item'])['Production'].sum().unstack()
+    yearly_trends = filtered_crop[filtered_crop['Item'].isin(top_p_crops)].groupby(['Year', 'Item'])['Production'].sum().unstack()
     
     fig, ax = plt.subplots(figsize=(14, 8))
     yearly_trends.plot(ax=ax, linewidth=2)
@@ -196,29 +196,53 @@ elif analysis_type == 'Temporal Analysis':
     ax.grid(True, alpha=0.3)
     
     # legend handling
-    plt.legend(
-        title='Crops',
-        bbox_to_anchor=(1.05, 1),
-        loc='upper left',
-        borderaxespad=0.,
-        fontsize='small'  # Smaller font for more items
-    )
-    
+    plt.legend(title='Crops', bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.,fontsize='small' )
     plt.tight_layout(rect=[0, 0, 0.85, 1])
     st.pyplot(fig)
+    
+ # Calculate top crops by total area harvested
+    top_ah_crops = filtered_crop.groupby('Item')['Area_Harvested'].sum().nlargest(n_crops).index
+    
+    st.subheader(f"Yearly Area_Harvested Trends (Top {n_crops} Crops)")
+    yearly_trends = filtered_crop[filtered_crop['Item'].isin(top_ah_crops)].groupby(['Year', 'Item'])['Area_Harvested'].sum().unstack()
+    
+    fig, ax = plt.subplots(figsize=(14, 8))
+    yearly_trends.plot(ax=ax, linewidth=2)
+    ax.set_ylabel('Area_Harvested(tonnes)')
+    ax.set_title(f'Area_Harvested Trends of Top {n_crops} Crops', pad=20)
+    ax.tick_params(axis='x', rotation=45)
+    ax.grid(True, alpha=0.3)
+    
+    # legend handling
+    plt.legend(title='Crops', bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.,fontsize='small' )
+    plt.tight_layout(rect=[0, 0, 0.85, 1])
+    st.pyplot(fig)
+    
+    # Calculate top crops by total yield 
+    top_crops = filtered_crop.groupby('Item')['Yield'].sum().nlargest(n_crops).index
+    
+    st.subheader(f"Yearly Yield Trends (Top {n_crops} Crops)")
+    yearly_trends = filtered_crop[filtered_crop['Item'].isin(top_crops)].groupby(['Year', 'Item'])['Yield'].sum().unstack()
+    
+    fig, ax = plt.subplots(figsize=(14, 8))
+    yearly_trends.plot(ax=ax, linewidth=2)
+    ax.set_ylabel('Yield(tonnes)')
+    ax.set_title(f'Yield Trends of Top {n_crops} Crops', pad=20)
+    ax.tick_params(axis='x', rotation=45)
+    ax.grid(True, alpha=0.3)
+    
+    # legend handling
+    plt.legend(title='Crops', bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.,fontsize='small' )
+    plt.tight_layout(rect=[0, 0, 0.85, 1])
+    st.pyplot(fig)
+
 
    #########
    # Yield Growth Analysis Section
     st.subheader("Yield Growth Analysis")
     
     # Step 1: Get top N crops by median yield (default N=10)
-    top_n = st.slider(
-        "Number of top crops to display", 
-        min_value=5, 
-        max_value=50, 
-        value=10,
-        key='yield_top_n'
-    )
+    top_n = st.slider( "Number of top crops to display",  min_value=5, max_value=50, value=10, key='yield_top_n')
     
     # Calculate top crops (using median to avoid outlier skew)
     top_crops = filtered_crop.groupby('Item')['Yield'].median().nlargest(top_n)
@@ -263,7 +287,9 @@ elif analysis_type == 'Temporal Analysis':
             )
     else:
         st.warning("No crops available for analysis.")
+        
 ##################################################################################################################################################################################################################
+
 elif analysis_type == 'Environmental Relationships':
     st.header("🌍 Environmental Relationships")
     
