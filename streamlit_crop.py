@@ -167,11 +167,8 @@ if analysis_type == 'Analyze Crop Distribution':
             origin='lower'  # So that regions start from bottom if you prefer
         )
         
-        fig.update_layout(
-            title="Crop Production Heatmap by Region (Log Scale)",
-            height=900,
-            margin=dict(l=80, r=80, t=100, b=80)
-        )
+        fig.update_layout(title="Crop Production Heatmap by Region (Log Scale)", height=900 ,
+                           margin = {'l': 80, 'r': 80, 't': 100, 'b': 80 } )
         
         # Show Plotly figure in Streamlit
         st.plotly_chart(fig, use_container_width=True)
