@@ -162,6 +162,42 @@ if analysis_type == 'Analyze Crop Distribution':
         ax.set_title('Production Heatmap (Log Scale)')
         st.pyplot(fig)
 
+        ###### 2 # Assuming filtered_crop is your filtered DataFrame
+    
+        st.subheader("Crop Distribution by Region (Interactive Heatmap)")
+        
+        # Create pivot table: rows = regions, columns = crops, values = mean production
+        pivot_data = filtered_crop.pivot_table(
+            index='Area',
+            columns='Item',
+            values='Production',
+            aggfunc='mean'
+        ).fillna(0)
+        
+        # Apply log1p transform for better color scaling
+        log_pivot = np.log1p(pivot_data)
+        
+        # Create interactive heatmap with Plotly Express
+        fig = px.imshow(
+            log_pivot,
+            labels=dict(x="Crop", y="Region", color="Log(Mean Production + 1)"),
+            x=log_pivot.columns,
+            y=log_pivot.index,
+            color_continuous_scale='YlOrBr',
+            aspect='auto',
+            origin='lower'  # So that regions start from bottom if you prefer
+        )
+        
+        fig.update_layout(
+            title="Crop Production Heatmap by Region (Log Scale)",
+            height=700,
+            margin=dict(l=80, r=80, t=100, b=80)
+        )
+        
+        # Show Plotly figure in Streamlit
+        st.plotly_chart(fig, use_container_width=True)
+
+
  ##################################################################################################################################################################################################################
 elif analysis_type == 'Temporal Analysis':
    
