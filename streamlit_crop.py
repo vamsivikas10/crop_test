@@ -182,6 +182,8 @@ elif analysis_type == 'Temporal Analysis':
     # Let user select top N crops to display
     n_crops = st.slider("Select number of top crops to display", 5, 50, 10)
     
+    ##(1)##
+    
     # Calculate top crops by total production
     top_p_crops = filtered_crop.groupby('Item')['Production'].sum().nlargest(n_crops).index
     
@@ -199,8 +201,9 @@ elif analysis_type == 'Temporal Analysis':
     plt.legend(title='Crops', bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.,fontsize='small' )
     plt.tight_layout(rect=[0, 0, 0.85, 1])
     st.pyplot(fig)
-    
- # Calculate top crops by total area harvested
+
+    ##(2)##
+    # Calculate top crops by total area harvested
     top_ah_crops = filtered_crop.groupby('Item')['Area_Harvested'].sum().nlargest(n_crops).index
     
     st.subheader(f"Yearly Area_Harvested Trends (Top {n_crops} Crops)")
@@ -217,7 +220,8 @@ elif analysis_type == 'Temporal Analysis':
     plt.legend(title='Crops', bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.,fontsize='small' )
     plt.tight_layout(rect=[0, 0, 0.85, 1])
     st.pyplot(fig)
-    
+
+    ##(3)##
     # Calculate top crops by total yield 
     top_crops = filtered_crop.groupby('Item')['Yield'].sum().nlargest(n_crops).index
     
@@ -236,9 +240,9 @@ elif analysis_type == 'Temporal Analysis':
     plt.tight_layout(rect=[0, 0, 0.85, 1])
     st.pyplot(fig)
 
-
-   #########
-   # Yield Growth Analysis Section
+    ##(4)##
+    
+    # Yield Growth Analysis Section
     st.subheader("Yield Growth Analysis")
     
     # Step 1: Get top N crops by median yield (default N=10)
@@ -287,6 +291,57 @@ elif analysis_type == 'Temporal Analysis':
             )
     else:
         st.warning("No crops available for analysis.")
+
+############(5)
+
+st.subheader("Growth Analysis: Yield/Production Trends")
+
+# User selects metric and grouping
+metric = st.selectbox("Metric to analyze", ["Yield", "Production"], key="growth_metric")
+group_by = st.selectbox("Analyze trend by", ["Item", "Area"], key="growth_group")
+
+group_col = "Item" if group_by.startswith("Item") else "Area"
+
+trend_results = []
+
+for group, group_df in filtered_crop.groupby(group_col):
+    group_df = group_df.sort_values("Year")
+    if group_df["Year"].nunique() >= 2:
+        first_year = group_df["Year"].min()
+        last_year = group_df["Year"].max()
+        first_value = group_df.loc[group_df["Year"] == first_year, metric].mean()
+        last_value = group_df.loc[group_df["Year"] == last_year, metric].mean()
+        if first_value != 0:
+            pct_change = 100 * (last_value - first_value) / abs(first_value)
+        else:
+            pct_change = np.nan  # Avoid division by zero
+        trend_results.append({
+            group_col: group,
+            "first_year": first_year,
+            "last_year": last_year,
+            f"{metric}_start": first_value,
+            f"{metric}_end": last_value,
+            "pct_change": pct_change,
+            "years": group_df["Year"].nunique()
+        })
+
+trend_df = pd.DataFrame(trend_results).dropna(subset=["pct_change"])
+
+if not trend_df.empty:
+    st.write(f"Top 10 {group_by} with **increasing** {metric}:")
+    st.dataframe(trend_df.sort_values("pct_change", ascending=False).head(10)[[group_col, "first_year", "last_year", f"{metric}_start", f"{metric}_end", "pct_change"]])
+
+    st.write(f"Top 10 {group_by} with **decreasing** {metric}:")
+    st.dataframe(trend_df.sort_values("pct_change", ascending=True).head(10)[[group_col, "first_year", "last_year", f"{metric}_start", f"{metric}_end", "pct_change"]])
+
+    # Optional: Plot trend for a selected crop/region
+    selected = st.selectbox(f"Select {group_by} to visualize trend", trend_df[group_col])
+    plot_df = filtered_crop[filtered_crop[group_col] == selected].sort_values("Year")
+    fig = px.line(plot_df, x="Year", y=metric, markers=True, title=f"{metric} Trend for {selected}")
+    st.plotly_chart(fig, use_container_width=True)
+else:
+    st.warning("Not enough data to compute trends for the selected grouping.")
+
         
 ##################################################################################################################################################################################################################
 
