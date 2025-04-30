@@ -148,33 +148,10 @@ if analysis_type == 'Analyze Crop Distribution':
         st.pyplot(fig)
 
         ##(3)##
-        st.subheader("Crop Distribution by Region")
-        pivot_data = filtered_crop.pivot_table(
-            index='Area', 
-            columns='Item', 
-            values='Production', 
-            aggfunc='mean'
-        ).fillna(0)
-        fig, ax = plt.subplots(figsize=(12, 8))
-        sns.heatmap(
-            np.log1p(pivot_data),  # Using log scale for better visualization
-            cmap='YlOrBr',
-            ax=ax
-        )
-        ax.set_title('Production Heatmap (Log Scale)')
-        st.pyplot(fig)
-
-        ###### 2 # Assuming filtered_crop is your filtered DataFrame
-    
         st.subheader("Crop Distribution by Region (Interactive Heatmap)")
         
         # Create pivot table: rows = regions, columns = crops, values = mean production
-        pivot_data2 = filtered_crop.pivot_table(
-            index='Area',
-            columns='Item',
-            values='Production',
-            aggfunc='mean'
-        ).fillna(0)
+        pivot_data2 = filtered_crop.pivot_table( index='Area',columns='Item',values='Production',aggfunc='mean').fillna(0)
         
         # Apply log1p transform for better color scaling
         log_pivot = np.log1p(pivot_data2)
@@ -192,7 +169,7 @@ if analysis_type == 'Analyze Crop Distribution':
         
         fig.update_layout(
             title="Crop Production Heatmap by Region (Log Scale)",
-            height=700,
+            height=900,
             margin=dict(l=80, r=80, t=100, b=80)
         )
         
