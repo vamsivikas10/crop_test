@@ -82,7 +82,7 @@ plt.style.use('ggplot')
 crop=crop_data_df
 
 # Main title 
-st.title(":blue[Bird Species Analysis]")
+st.title(":blue[Crop Analysis]")
 
 # Sidebar options
 analysis_type = st.sidebar.radio(
@@ -126,46 +126,45 @@ if apply_country_filter:
 
 # Main analysis sections
 if analysis_type == 'Analyze Crop Distribution':
-    st.header("🌱 Crop Distribution Analysis")
+        st.header("🌱 Crop Distribution Analysis")
     
-    col1, col2 = st.columns(2)
     
-    with col1:
         st.subheader("Top Cultivated Crops")
         top_crops = filtered_crop.groupby('Item')['Area_Harvested'].sum().nlargest(10)
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(10, 6))
         top_crops.plot(kind='barh', color=COLOR_1, ax=ax)
         ax.set_xlabel('Total Area Harvested (ha)')
         ax.set_ylabel('Crop')
         st.pyplot(fig)
     
-    with col2:
+   
         st.subheader("Geographical Distribution")
         top_regions = filtered_crop.groupby('Area')['Production'].sum().nlargest(10)
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(10, 6))
         top_regions.plot(kind='barh', color=COLOR_2, ax=ax)
         ax.set_xlabel('Total Production (tonnes)')
         ax.set_ylabel('Region')
         st.pyplot(fig)
         
-    st.subheader("Crop Distribution by Region")
-    pivot_data = filtered_crop.pivot_table(
-        index='Area', 
-        columns='Item', 
-        values='Production', 
-        aggfunc='mean'
-    ).fillna(0)
-    fig, ax = plt.subplots(figsize=(12, 8))
-    sns.heatmap(
-        np.log1p(pivot_data),  # Using log scale for better visualization
-        cmap='YlOrBr',
-        ax=ax
-    )
-    ax.set_title('Production Heatmap (Log Scale)')
-    st.pyplot(fig)
+        st.subheader("Crop Distribution by Region")
+        pivot_data = filtered_crop.pivot_table(
+            index='Area', 
+            columns='Item', 
+            values='Production', 
+            aggfunc='mean'
+        ).fillna(0)
+        fig, ax = plt.subplots(figsize=(12, 8))
+        sns.heatmap(
+            np.log1p(pivot_data),  # Using log scale for better visualization
+            cmap='YlOrBr',
+            ax=ax
+        )
+        ax.set_title('Production Heatmap (Log Scale)')
+        st.pyplot(fig)
 
+ ##################################################################################################################################################################################################################
 elif analysis_type == 'Temporal Analysis':
-    ##############
+   
     st.header("📈 Temporal Trends Analysis")
     
     # Let user select top N crops to display
@@ -252,7 +251,7 @@ elif analysis_type == 'Temporal Analysis':
             )
     else:
         st.warning("No crops available for analysis.")
-
+##################################################################################################################################################################################################################
 elif analysis_type == 'Environmental Relationships':
     st.header("🌍 Environmental Relationships")
     
@@ -318,7 +317,7 @@ elif analysis_type == 'Input-Output Relationships':
     )
     ax.set_title('Production vs Cultivated Area')
     st.pyplot(fig)
-
+##################################################################################################################################################################################################################
 elif analysis_type == 'Comparative Analysis':
     st.header("📊 Comparative Analysis")
     
@@ -351,7 +350,7 @@ elif analysis_type == 'Comparative Analysis':
     )
     ax.set_ylabel('Productivity (Production/Area)')
     st.pyplot(fig)
-
+##################################################################################################################################################################################################################
 elif analysis_type == 'Outliers and Anomalies':
     st.header("🔍 Outliers and Anomalies Detection")
     
@@ -401,7 +400,7 @@ elif analysis_type == 'Outliers and Anomalies':
         ax.set_title('Yield Outliers Highlighted')
         st.pyplot(fig)
 
-# Add some space at the bottom
+#####################################################
 st.markdown("---")
 st.markdown("### Data Summary")
 st.write(f"Total records: {len(filtered_crop):,}")
