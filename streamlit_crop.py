@@ -126,9 +126,10 @@ if apply_country_filter:
 
 # Main analysis sections
 if analysis_type == 'Analyze Crop Distribution':
+        
         st.header("🌱 Crop Distribution Analysis")
     
-    
+        ##(1)##
         st.subheader("Top Cultivated Crops")
         top_crops = filtered_crop.groupby('Item')['Area_Harvested'].sum().nlargest(10)
         fig, ax = plt.subplots(figsize=(10, 6))
@@ -137,7 +138,7 @@ if analysis_type == 'Analyze Crop Distribution':
         ax.set_ylabel('Crop')
         st.pyplot(fig)
     
-   
+        ##(2)##
         st.subheader("Geographical Distribution")
         top_regions = filtered_crop.groupby('Area')['Production'].sum().nlargest(10)
         fig, ax = plt.subplots(figsize=(10, 6))
@@ -145,7 +146,8 @@ if analysis_type == 'Analyze Crop Distribution':
         ax.set_xlabel('Total Production (tonnes)')
         ax.set_ylabel('Region')
         st.pyplot(fig)
-        
+
+        ##(3)##
         st.subheader("Crop Distribution by Region")
         pivot_data = filtered_crop.pivot_table(
             index='Area', 
@@ -167,7 +169,7 @@ if analysis_type == 'Analyze Crop Distribution':
         st.subheader("Crop Distribution by Region (Interactive Heatmap)")
         
         # Create pivot table: rows = regions, columns = crops, values = mean production
-        pivot_data = filtered_crop.pivot_table(
+        pivot_data2 = filtered_crop.pivot_table(
             index='Area',
             columns='Item',
             values='Production',
@@ -175,7 +177,7 @@ if analysis_type == 'Analyze Crop Distribution':
         ).fillna(0)
         
         # Apply log1p transform for better color scaling
-        log_pivot = np.log1p(pivot_data)
+        log_pivot = np.log1p(pivot_data2)
         
         # Create interactive heatmap with Plotly Express
         fig = px.imshow(
