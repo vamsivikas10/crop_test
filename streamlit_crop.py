@@ -358,7 +358,7 @@ elif analysis_type == 'Environmental Relationships':
     hexbin = ax.hexbin(
         x=filtered_crop['Area_Harvested'],
         y=filtered_crop['Yield'],
-        gridsize=80,
+        gridsize=50,
         cmap='YlOrBr',
         bins='log',
         mincnt=1,
