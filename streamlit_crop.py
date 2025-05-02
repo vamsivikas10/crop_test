@@ -301,9 +301,9 @@ elif analysis_type == 'Temporal Analysis':
     group_by = st.selectbox("Analyze trend by", ["Item", "Area"], key="growth_group")
     
     if group_by.startswith("Item"):
-    group_col = "Item"
+     group_col = "Item"
     else:
-    group_col = "Area"
+     group_col = "Area"
     
     trend_results = []
     
