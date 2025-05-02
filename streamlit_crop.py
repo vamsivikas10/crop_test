@@ -364,7 +364,18 @@ elif analysis_type == 'Environmental Relationships':
         mincnt=1,
         alpha=0.7
     )
-    
+          # Overlay a sample of points for context
+    sample_df = filtered_crop.sample(1000)  # Avoid overplotting
+    sns.scatterplot(
+        data=sample_df,
+        x='Area_Harvested',
+        y='Yield',
+        color='red',
+        alpha=0.3,
+        s=20,
+        ax=ax,
+        label='Sample Points'
+    )
 
     
     ax.set_xscale('log')
