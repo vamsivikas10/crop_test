@@ -300,7 +300,10 @@ elif analysis_type == 'Temporal Analysis':
     metric = st.selectbox("Metric to analyze", ["Yield", "Production"], key="growth_metric")
     group_by = st.selectbox("Analyze trend by", ["Item", "Area"], key="growth_group")
     
-    group_col = "Item" if group_by.startswith("Item") else "Area"
+    if group_by.startswith("Item"):
+    group_col = "Item"
+    else:
+    group_col = "Area"
     
     trend_results = []
     
@@ -362,18 +365,7 @@ elif analysis_type == 'Environmental Relationships':
         alpha=0.7
     )
     
-    # Overlay a sample of points for context
-    sample_df = filtered_crop.sample(1000)  # Avoid overplotting
-    sns.scatterplot(
-        data=sample_df,
-        x='Area_Harvested',
-        y='Yield',
-        color='red',
-        alpha=0.3,
-        s=20,
-        ax=ax,
-        label='Sample Points'
-    )
+  
     
     ax.set_xscale('log')
     ax.set_yscale('log')
