@@ -358,25 +358,14 @@ elif analysis_type == 'Environmental Relationships':
     hexbin = ax.hexbin(
         x=filtered_crop['Area_Harvested'],
         y=filtered_crop['Yield'],
-        gridsize=40,
+        gridsize=80,
         cmap='YlOrBr',
         bins='log',
         mincnt=1,
         alpha=0.7
     )
     
-      # Overlay a sample of points for context
-    sample_df = filtered_crop.sample(1000)  # Avoid overplotting
-    sns.scatterplot(
-        data=sample_df,
-        x='Area_Harvested',
-        y='Yield',
-        color='red',
-        alpha=0.3,
-        s=20,
-        ax=ax,
-        label='Sample Points'
-    )
+
     
     ax.set_xscale('log')
     ax.set_yscale('log')
