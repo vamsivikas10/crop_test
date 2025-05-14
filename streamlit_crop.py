@@ -279,8 +279,7 @@ if sidebar_checkbox:
         else:
             st.info("Select a crop and area to get farming recommendations")
     
-else:
-    st.write("❌ Please check the box to proceed.")
+
 
 Prediction = st.sidebar.radio('model','production_prediction')
 
