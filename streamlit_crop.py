@@ -60,7 +60,7 @@ def initialize():
                             c.data_id,
                             a.Area,
                             i.Item,
-                            y.year,
+                            y.Year,
                             c.Area_Harvested,
                             c.Yield,
                             c.Production
