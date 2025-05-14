@@ -56,7 +56,23 @@ def initialize():
     
     try:
         # Queries
-        crop_query = """SELECT * FROM crop_data LIMIT 45015"""
+        crop_query = """SELECT 
+                            c.data_id,
+                            a.Area,
+                            i.Item,
+                            y.year,
+                            c.Area_Harvested,
+                            c.Yield,
+                            c.Production
+                        FROM 
+                            CROP_data c
+                        JOIN 
+                            areas a ON c.Area_id = a.Area_id
+                        JOIN 
+                            items i ON c.Item_id = i.Item_id
+                        JOIN 
+                            years y ON c.year_id = y.year_id
+                        LIMIT 44000"""
         
         crop_data_df = fetch_data(conn, crop_query)
     
