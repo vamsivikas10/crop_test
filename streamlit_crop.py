@@ -280,9 +280,6 @@ if sidebar_checkbox:
             st.info("Select a crop and area to get farming recommendations")
     
 
-
-Prediction = st.sidebar.radio('model','production_prediction')
-
 # Sidebar Filters
 st.sidebar.header("Filters")
 
