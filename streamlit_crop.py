@@ -531,7 +531,7 @@ st.write(f"Time period: {filtered_crop['Year'].min()} to {filtered_crop['Year'].
 st.write(f"Regions: {len(filtered_crop['Area'].unique())}")
 st.write(f"Crops: {len(filtered_crop['Item'].unique())}")
 
-if Prediction == "Production Prediction":
+if Prediction == "production_prediction":
         df = crop_data_df 
         # ======================
         # 1. DATA PREPROCESSING
