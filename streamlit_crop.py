@@ -213,10 +213,10 @@ if sidebar_checkbox:
             
             results.append({
                 "Model": name,
-                "R² Score": #round(r2, 4),
-                "MAE": #round(mae, 2),
-                "MSE": #round(mse, 2),
-                "RMSE": #round(rmse, 2)
+                "R² Score": r2,
+                "MAE": mae,
+                "MSE": mse,
+                "RMSE":rmse
             })
 
         results_df = pd.DataFrame(results)
