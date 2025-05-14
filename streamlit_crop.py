@@ -5,7 +5,16 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import streamlit as st
-import plotly.express as px  
+import plotly.express as px 
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, OneHotEncoder, PolynomialFeatures
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+from scipy import stats 
 
 # Database configuration
 config = {
@@ -112,6 +121,8 @@ analysis_type = st.sidebar.radio(
         'Outliers and Anomalies'
     ]
 )
+
+Prediction = st.sidebar.radio('model','production_prediction')
 
 # Sidebar Filters
 st.sidebar.header("Filters")
@@ -519,3 +530,157 @@ st.write(f"Total records: {len(filtered_crop):,}")
 st.write(f"Time period: {filtered_crop['Year'].min()} to {filtered_crop['Year'].max()}")
 st.write(f"Regions: {len(filtered_crop['Area'].unique())}")
 st.write(f"Crops: {len(filtered_crop['Item'].unique())}")
+
+if Prediction == "Production Prediction":
+        df = crop_data_df 
+        # ======================
+        # 1. DATA PREPROCESSING
+        # ======================
+        # Handle outliers
+        numeric_cols = ['Area harvested', 'Yield', 'Production']
+        z_scores = np.abs(stats.zscore(df[numeric_cols]))
+        df = df[(z_scores < 3).all(axis=1)]
+
+        # Feature engineering
+        df['Area_Yield_Interaction'] = df['Area harvested'] * df['Yield']
+
+        # Define features and target
+        X = df[['Area harvested', 'Yield', 'Year', 'Item', 'Area', 'Area_Yield_Interaction']]
+        y = df['Production']
+
+        # Train-test split
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+        # ======================
+        # 2. PREPROCESSING SETUP
+        # ======================
+        numeric_features = ['Area harvested', 'Yield', 'Year', 'Area_Yield_Interaction']
+        categorical_features = ['Item', 'Area']
+
+        preprocessor = ColumnTransformer(
+            transformers=[
+                ('num', StandardScaler(), numeric_features),
+                ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_features)
+            ])
+
+        # ======================
+        # 3. MODEL PIPELINES
+        # ======================
+        # Linear Regression Pipeline
+        lr_pipeline = Pipeline([
+            ('preprocessor', preprocessor),
+            ('regressor', LinearRegression())
+        ])
+
+        # Random Forest Pipeline
+        rf_pipeline = Pipeline([
+            ('preprocessor', preprocessor),
+            ('regressor', RandomForestRegressor(random_state=42))
+        ])
+
+        # Decision Tree Pipeline
+        dt_pipeline = Pipeline([
+            ('preprocessor', preprocessor),
+            ('regressor', DecisionTreeRegressor(random_state=42))
+        ])
+
+        # Polynomial Regression Pipeline
+        poly_pipeline = Pipeline([
+            ('preprocessor', preprocessor),
+            ('poly', PolynomialFeatures(degree=2, include_bias=False)),
+            ('regressor', LinearRegression())
+        ])
+
+        # Train all models
+        pipelines = {
+            "Linear Regression": lr_pipeline,
+            "Random Forest": rf_pipeline,
+            "Decision Tree": dt_pipeline,
+            "Polynomial Regression": poly_pipeline
+        }
+
+        for name, pipeline in pipelines.items():
+            pipeline.fit(X_train, y_train)
+
+        # ======================
+        # 4. STREAMLIT APP
+        # ======================
+        st.title("🌾 Crop Production Predictor")
+
+        # Model Evaluation
+        st.subheader("📈 Model Evaluation on Test Data")
+        results = []
+        for name, pipeline in pipelines.items():
+            y_pred = pipeline.predict(X_test)
+            r2 = r2_score(y_test, y_pred)
+            mae = mean_absolute_error(y_test, y_pred)
+            mse = mean_squared_error(y_test, y_pred)
+            rmse = np.sqrt(mse)
+            
+            results.append({
+                "Model": name,
+                "R² Score": round(r2, 4),
+                "MAE": round(mae, 2),
+                "MSE": round(mse, 2),
+                "RMSE": round(rmse, 2)
+            })
+
+        results_df = pd.DataFrame(results)
+        st.dataframe(results_df)
+
+        best_model_name = results_df.loc[results_df['R² Score'].idxmax(), 'Model']
+        st.success(f"✅ Best model based on test data R² Score: {best_model_name}")
+
+        # ======================
+        # 5. PREDICTION INTERFACE
+        # ======================
+        st.subheader("🔮 Production Prediction")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            year = st.number_input("Year", min_value=2000, max_value=2100, value=2023)
+            area_harvested = st.number_input("Area Harvested (hectares)", min_value=1, value=100)
+            yield_val = st.number_input("Yield (tons/hectare)", min_value=0.0, value=2.5, step=0.1)
+
+        with col2:
+            item = st.selectbox("Crop", options=sorted(df['Item'].unique()))
+            area = st.selectbox("Area", options=sorted(df['Area'].unique()))
+            price_per_ton = st.number_input("Price per Ton (USD)", value=250.0)
+
+        if st.button("Predict Production"):
+            # Create input DataFrame with all required features
+            input_data = pd.DataFrame({
+                'Area harvested': [area_harvested],
+                'Yield': [yield_val],
+                'Year': [year],
+                'Item': [item],
+                'Area': [area],
+                'Area_Yield_Interaction': [area_harvested * yield_val]
+            })
+            
+            st.markdown("### 📊 Prediction Results")
+            
+            # Get predictions from all models
+            for name, pipeline in pipelines.items():
+                prediction = pipeline.predict(input_data)[0]
+                prediction = max(0, prediction)  # Ensure non-negative
+                value = prediction * price_per_ton
+                
+                st.write(f"**{name}:**")
+                st.write(f"- Production: {prediction:.2f} tons")
+                st.write(f"- Estimated Value: ${value:,.2f} USD")
+                st.write("---")
+
+        # ======================
+        # 6. ADDITIONAL FEATURES
+        # ======================
+        st.subheader("🌱 Farming Recommendations")
+
+        if item and area:
+            st.write(f"### Precision farming tips for {item} in {area}:")
+            st.write("- Use soil sensors to optimize irrigation")
+            st.write("- Implement drone-based crop monitoring")
+            st.write("- Consider AI-powered pest detection systems")
+        else:
+            st.info("Select a crop and area to get farming recommendations")
