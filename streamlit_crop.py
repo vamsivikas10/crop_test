@@ -123,9 +123,9 @@ analysis_type = st.sidebar.radio(
 )
 
 
-agree = st.checkbox("PRODUCTION PREDICTION", value=False)
+sidebar_checkbox = st.sidebar.checkbox("Prediction")
 
-if agree:
+if sidebar_checkbox:
         df = crop_data_df 
         # ======================
         # 1. DATA PREPROCESSING
@@ -213,10 +213,10 @@ if agree:
             
             results.append({
                 "Model": name,
-                "R² Score": round(r2, 4),
-                "MAE": round(mae, 2),
-                "MSE": round(mse, 2),
-                "RMSE": round(rmse, 2)
+                "R² Score": #round(r2, 4),
+                "MAE": #round(mae, 2),
+                "MSE": #round(mse, 2),
+                "RMSE": #round(rmse, 2)
             })
 
         results_df = pd.DataFrame(results)
@@ -240,7 +240,7 @@ if agree:
         with col2:
             item = st.selectbox("Crop", options=sorted(df['Item'].unique()))
             area = st.selectbox("Area", options=sorted(df['Area'].unique()))
-            price_per_ton = st.number_input("Price per Ton (USD)", value=250.0)
+            #price_per_ton = st.number_input("Price per Ton (USD)", value=250.0)
 
         if st.button("Predict Production"):
             # Create input DataFrame with all required features
