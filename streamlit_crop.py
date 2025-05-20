@@ -620,14 +620,29 @@ elif analysis_type == 'Comparative Analysis':
         
     st.subheader("Productivity Analysis")
     filtered_crop['Productivity'] = filtered_crop['Production'] / filtered_crop['Area_Harvested']
+    
+    top_n = 5  # Show top 5 crops per region
     productive_regions = filtered_crop.groupby(['Area', 'Item'])['Productivity'].mean().unstack()
-    fig, ax = plt.subplots(figsize=(12, 6))
-    productive_regions.nlargest(10, productive_regions.columns[0]).plot(
+    
+    # Get top crops for each region
+    top_crops = productive_regions.mean().nlargest(top_n).index
+    
+    fig, ax = plt.subplots(figsize=(14, 8))
+    productive_regions[top_crops].nlargest(10, top_crops[0]).plot(
         kind='bar',
         ax=ax,
-        color=[COLOR_1, COLOR_2]
+        colormap='viridis'  # Better color differentiation
+    )
+    
+    ax.legend(
+        bbox_to_anchor=(1.05, 1),
+        loc='upper left',
+        borderaxespad=0.,
+        title='Crops',
+        fontsize='small'
     )
     ax.set_ylabel('Productivity (Production/Area)')
+    plt.tight_layout()
     st.pyplot(fig)
 ##################################################################################################################################################################################################################
 elif analysis_type == 'Outliers and Anomalies':
