@@ -127,22 +127,22 @@ analysis_type = st.sidebar.radio(
 agree = st.sidebar.checkbox("Prediction", value=False)
 
 if agree:
-    st.sidebar.header("Production Prediction")
+    st.header("Production Prediction")
     
     # Load artifacts CORRECTLY
     model = joblib.load("crop_random_forest_model_new.pkl") 
     preprocessor = joblib.load("preprocessor_rf.pkl")  
     
-    st.sidebar.write("✅ Model loaded successfully!")
+    st.write("✅ Model loaded successfully!")
     
     # Get ALL REQUIRED FEATURES
-    area_harvested = st.sidebar.number_input("Area Harvested (ha)", min_value=0.0, value=100.0)
-    yield_value = st.sidebar.number_input("Yield (hg/ha)", min_value=0.0, value=50000.0)
-    year = st.sidebar.selectbox("Year", options=sorted(df_rf['Year'].unique()))
-    item = st.sidebar.selectbox("Crop Type", options=df_rf['Item'].unique()) 
-    area = st.sidebar.selectbox("Region", options=df_rf['Area'].unique()) 
+    area_harvested = st.number_input("Area Harvested (ha)", min_value=0.0, value=100.0)
+    yield_value = st.number_input("Yield (hg/ha)", min_value=0.0, value=50000.0)
+    year = st.selectbox("Year", options=sorted(df_rf['Year'].unique()))
+    item = st.selectbox("Crop Type", options=df_rf['Item'].unique()) 
+    area = st.selectbox("Region", options=df_rf['Area'].unique()) 
 
-    if st.sidebar.button("Predict Production"):
+    if st.button("Predict Production"):
        
         input_data = pd.DataFrame([{
             'Area harvested': area_harvested, 
@@ -157,7 +157,7 @@ if agree:
         
         # Predict
         prediction = model.predict(processed_input)[0]
-        st.sidebar.success(f"Predicted Production: {prediction:.2f} tonnes")
+        st.success(f"Predicted Production: {prediction:.2f} tonnes")
         
 # Sidebar Filters
 st.sidebar.header("Filters")
