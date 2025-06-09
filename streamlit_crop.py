@@ -143,7 +143,7 @@ if agree:
     area = st.selectbox("Region", options=df_rf['Area'].unique()) 
 
     if st.button("Predict Production"):
-       
+        print(sklearn.__version__)
         input_data = pd.DataFrame([{
             'Area harvested': area_harvested, 
             'Yield': yield_value,
