@@ -1,3 +1,4 @@
+joblib
 mysql-connector-python
 streamlit
 pandas
@@ -6,4 +7,4 @@ seaborn
 plotly
 scikit-learn
 scipy
-joblib
+
