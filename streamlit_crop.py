@@ -138,9 +138,9 @@ if agree:
     # Get ALL REQUIRED FEATURES
     area_harvested = st.number_input("Area Harvested (ha)", min_value=0.0, value=100.0)
     yield_value = st.number_input("Yield (hg/ha)", min_value=0.0, value=50000.0)
-    year = st.selectbox("Year", options=sorted(df_rf['Year'].unique()))
-    item = st.selectbox("Crop Type", options=df_rf['Item'].unique()) 
-    area = st.selectbox("Region", options=df_rf['Area'].unique()) 
+    year = st.selectbox("Year", options=sorted(crop['Year'].unique()))
+    item = st.selectbox("Crop Type", options=crop['Item'].unique()) 
+    area = st.selectbox("Region", options=crop['Area'].unique()) 
 
     if st.button("Predict Production"):
         
