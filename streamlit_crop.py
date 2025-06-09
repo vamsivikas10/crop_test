@@ -128,7 +128,7 @@ agree = st.sidebar.checkbox("Prediction", value=False)
 
 if agree:
     st.header("Production Prediction")
-    print(sklearn.__version__)
+    
     # Load artifacts CORRECTLY
     model = joblib.load("crop_random_forest_model_new.pkl") 
     preprocessor = joblib.load("preprocessor_rf.pkl")  
