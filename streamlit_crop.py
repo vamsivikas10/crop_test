@@ -130,8 +130,8 @@ if agree:
     st.sidebar.header("Production Prediction")
     
     # Load artifacts CORRECTLY
-    model = joblib.load("crop_random_forest_model_new.pkl")  # FIXED FILENAME
-    preprocessor = joblib.load("preprocessor.pkl")  # YOU MUST SAVE THIS DURING TRAINING!
+    model = joblib.load("crop_random_forest_model_new.pkl") 
+    preprocessor = joblib.load("preprocessor_rf.pkl")  
     
     st.sidebar.write("✅ Model loaded successfully!")
     
@@ -139,20 +139,20 @@ if agree:
     area_harvested = st.sidebar.number_input("Area Harvested (ha)", min_value=0.0, value=100.0)
     yield_value = st.sidebar.number_input("Yield (hg/ha)", min_value=0.0, value=50000.0)
     year = st.sidebar.selectbox("Year", options=sorted(df_rf['Year'].unique()))
-    item = st.sidebar.selectbox("Crop Type", options=df_rf['Item'].unique())  # ADDED
-    area = st.sidebar.selectbox("Region", options=df_rf['Area'].unique())  # ADDED
+    item = st.sidebar.selectbox("Crop Type", options=df_rf['Item'].unique()) 
+    area = st.sidebar.selectbox("Region", options=df_rf['Area'].unique()) 
 
     if st.sidebar.button("Predict Production"):
-        # Create input with CORRECT COLUMN NAMES
+       
         input_data = pd.DataFrame([{
-            'Area harvested': area_harvested,  # MATCH TRAINING COLUMN NAME
+            'Area harvested': area_harvested, 
             'Yield': yield_value,
             'Year': year,
-            'Item': item,  # REQUIRED
-            'Area': area  # REQUIRED
+            'Item': item, 
+            'Area': area 
         }])
         
-        # PREPROCESS INPUT (critical!)
+        # PREPROCESS INPUT
         processed_input = preprocessor.transform(input_data)
         
         # Predict
