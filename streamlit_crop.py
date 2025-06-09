@@ -129,51 +129,35 @@ agree = st.sidebar.checkbox("Prediction", value=False)
 if agree:
     st.header("Production Prediction")
     
-    try:
-        # Verify files exist first
-        if not os.path.exists("crop_random_forest_model_new.pkl"):
-            raise FileNotFoundError("Model file not found")
-        if not os.path.exists("Preprocessor_rf.pkl"):
-            raise FileNotFoundError("Preprocessor file not found")
-            
-        # Load with pickle protocol 4
-        model = joblib.load("crop_random_forest_model_new.pkl") 
-        preprocessor = joblib.load("Preprocessor_rf.pkl")
+    # Load artifacts CORRECTLY
+    model = joblib.load("crop_random_forest_model_new.pkl") 
+    preprocessor = joblib.load("preprocessor_rf.pkl")  
+    
+    st.write("✅ Model loaded successfully!")
+    
+    # Get ALL REQUIRED FEATURES
+    area_harvested = st.number_input("Area Harvested (ha)", min_value=0.0, value=100.0)
+    yield_value = st.number_input("Yield (hg/ha)", min_value=0.0, value=50000.0)
+    year = st.selectbox("Year", options=sorted(df_rf['Year'].unique()))
+    item = st.selectbox("Crop Type", options=df_rf['Item'].unique()) 
+    area = st.selectbox("Region", options=df_rf['Area'].unique()) 
+
+    if st.button("Predict Production"):
+       
+        input_data = pd.DataFrame([{
+            'Area harvested': area_harvested, 
+            'Yield': yield_value,
+            'Year': year,
+            'Item': item, 
+            'Area': area 
+        }])
         
-        st.success("✅ Model artifacts loaded successfully!")
+        # PREPROCESS INPUT
+        processed_input = preprocessor.transform(input_data)
         
-        # Get options from your actual data (use filtered_crop instead of df_rf)
-        unique_years = sorted(filtered_crop['Year'].unique())
-        unique_items = filtered_crop['Item'].unique().tolist()
-        unique_areas = filtered_crop['Area'].unique().tolist()
-        
-        # Input form
-        with st.form("prediction_form"):
-            area_harvested = st.number_input("Area Harvested (ha)", min_value=0.0, value=100.0)
-            yield_value = st.number_input("Yield (hg/ha)", min_value=0.0, value=50000.0)
-            year = st.selectbox("Year", options=unique_years)
-            item = st.selectbox("Crop Type", options=unique_items)
-            area = st.selectbox("Region", options=unique_areas)
-            
-            if st.form_submit_button("Predict Production"):
-                input_data = pd.DataFrame([{
-                    'Area harvested': area_harvested,
-                    'Yield': yield_value,
-                    'Year': year,
-                    'Item': item,
-                    'Area': area
-                }])
-                
-                try:
-                    processed_input = preprocessor.transform(input_data)
-                    prediction = model.predict(processed_input)[0]
-                    st.success(f"Predicted Production: {prediction:.2f} tonnes")
-                except Exception as e:
-                    st.error(f"Prediction failed: {str(e)}")
-                    
-    except Exception as e:
-        st.error(f"Initialization error: {str(e)}")
-        st.info("Please ensure: 1) Model files exist 2) They were saved with the same Python version")
+        # Predict
+        prediction = model.predict(processed_input)[0]
+        st.success(f"Predicted Production: {prediction:.2f} tonnes")
         
 # Sidebar Filters
 st.sidebar.header("Filters")
