@@ -123,7 +123,7 @@ analysis_type = st.sidebar.radio(
 )
 
 
-sidebar_checkbox = st.sidebar.checkbox("Prediction")
+agree = st.sidebar.checkbox("Prediction")
 
 if agree:
     st.sidebar.header("Production Prediction")
