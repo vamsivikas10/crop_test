@@ -1,4 +1,4 @@
-import mysql.connector
+470.import mysql.connector
 from mysql.connector import Error
 import pandas as pd
 import numpy as np
@@ -128,7 +128,7 @@ agree = st.sidebar.checkbox("Prediction", value=False)
 
 if agree:
     st.sidebar.header("Production Prediction")
-    joblib_file = r"crop_random_forest_model.pkl"
+    joblib_file = r"crop_random_forest_model_new.pkl"
     if joblib_file:
         st.sidebar.write("✅ Model loaded successfully!")
         st.sidebar.write("You can now use the model for predictions.")
