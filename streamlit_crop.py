@@ -128,36 +128,37 @@ agree = st.sidebar.checkbox("Prediction", value=False)
 
 if agree:
     st.sidebar.header("Production Prediction")
-    joblib_file = r"crop_random_forest_model_new.pkl"
-    if joblib_file:
-        st.sidebar.write("✅ Model loaded successfully!")
-        st.sidebar.write("You can now use the model for predictions.")
-        
-        # Load the model
-        model = joblib.load(joblib_file)
-        
-        # Input features
-        st.sidebar.subheader("Input Features")
-        area_harvested = st.sidebar.number_input("Area Harvested (ha)", min_value=0.0, value=100.0, step=1.0)
-        yield_value = st.sidebar.number_input("Yield (hg/ha)", min_value=0.0, value=50.0, step=1.0)
-        year = st.sidebar.selectbox("Year", options=crop["Year"].unique(), index=len(crop["Year"].unique()) - 1)
-        
-        # Make prediction
-        if st.sidebar.button("Predict Production"):
-            input_data = pd.DataFrame({
-                'Area_Harvested': [area_harvested],
-                'Yield': [yield_value],
-                'Year': [year]
-            })
-            
-            prediction = model.predict(input_data)[0]
-            st.sidebar.success(f"Predicted Production: {prediction:.2f} tonnes")
     
-else:
-    st.write("❌ Please check the box to proceed.")
+    # Load artifacts CORRECTLY
+    model = joblib.load("crop_random_forest_model_new.pkl")  # FIXED FILENAME
+    preprocessor = joblib.load("preprocessor.pkl")  # YOU MUST SAVE THIS DURING TRAINING!
+    
+    st.sidebar.write("✅ Model loaded successfully!")
+    
+    # Get ALL REQUIRED FEATURES
+    area_harvested = st.sidebar.number_input("Area Harvested (ha)", min_value=0.0, value=100.0)
+    yield_value = st.sidebar.number_input("Yield (hg/ha)", min_value=0.0, value=50000.0)
+    year = st.sidebar.selectbox("Year", options=sorted(df_rf['Year'].unique()))
+    item = st.sidebar.selectbox("Crop Type", options=df_rf['Item'].unique())  # ADDED
+    area = st.sidebar.selectbox("Region", options=df_rf['Area'].unique())  # ADDED
 
-#Prediction = st.sidebar.radio('Model', ['production_prediction'])  # Correct
-
+    if st.sidebar.button("Predict Production"):
+        # Create input with CORRECT COLUMN NAMES
+        input_data = pd.DataFrame([{
+            'Area harvested': area_harvested,  # MATCH TRAINING COLUMN NAME
+            'Yield': yield_value,
+            'Year': year,
+            'Item': item,  # REQUIRED
+            'Area': area  # REQUIRED
+        }])
+        
+        # PREPROCESS INPUT (critical!)
+        processed_input = preprocessor.transform(input_data)
+        
+        # Predict
+        prediction = model.predict(processed_input)[0]
+        st.sidebar.success(f"Predicted Production: {prediction:.2f} tonnes")
+        
 # Sidebar Filters
 st.sidebar.header("Filters")
 
