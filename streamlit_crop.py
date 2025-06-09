@@ -155,7 +155,7 @@ if agree:
 else:
     st.write("❌ Please check the box to proceed.")
 
-Prediction = st.sidebar.radio('Model', ['production_prediction'])  # Correct
+#Prediction = st.sidebar.radio('Model', ['production_prediction'])  # Correct
 
 # Sidebar Filters
 st.sidebar.header("Filters")
