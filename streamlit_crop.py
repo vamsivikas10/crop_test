@@ -131,7 +131,7 @@ if agree:
     
     # Load artifacts CORRECTLY
     model = joblib.load("crop_random_forest_model_new.pkl") 
-    preprocessor = joblib.load("preprocessor_rf.pkl")  
+    preprocessor = joblib.load("Preprocessor_rf.pkl")  
     
     st.write("✅ Model loaded successfully!")
     
