@@ -128,7 +128,7 @@ agree = st.sidebar.checkbox("Prediction")
 
 if agree:
     st.sidebar.header("Production Prediction")
-    joblib_file = r"C:\Users\VAMSI\OneDrive\Desktop\crop project\crop_random_forest_model.pkl"
+    joblib_file = r"crop_random_forest_model.pkl"
     if joblib_file:
         st.sidebar.write("✅ Model loaded successfully!")
         st.sidebar.write("You can now use the model for predictions.")
