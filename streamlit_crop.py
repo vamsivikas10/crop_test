@@ -128,7 +128,7 @@ agree = st.sidebar.checkbox("Prediction", value=False)
 
 if agree:
     st.header("Production Prediction")
-    
+    print(sklearn.__version__)
     # Load artifacts CORRECTLY
     model = joblib.load("crop_random_forest_model_new.pkl") 
     preprocessor = joblib.load("preprocessor_rf.pkl")  
@@ -143,7 +143,7 @@ if agree:
     area = st.selectbox("Region", options=df_rf['Area'].unique()) 
 
     if st.button("Predict Production"):
-        print(sklearn.__version__)
+        
         input_data = pd.DataFrame([{
             'Area harvested': area_harvested, 
             'Yield': yield_value,
